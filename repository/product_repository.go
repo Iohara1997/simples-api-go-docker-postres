@@ -93,3 +93,26 @@ func (pr *ProductRepository) GetProductById (id int) (*model.Product, error) {
 
 	return &product, nil
 }
+
+func (pr *ProductRepository) DeleteById (id int) (string, error) {
+	query, err := pr.connection.Prepare("DELETE FROM product WHERE id = $1")
+
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+
+	err = query.QueryRow(id).Err()
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "Product does not exist", nil
+		}
+
+		return "", err
+	}
+
+	query.Close()
+
+	return "", nil
+}
